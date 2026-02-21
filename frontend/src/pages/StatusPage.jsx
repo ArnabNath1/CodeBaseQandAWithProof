@@ -131,7 +131,7 @@ export default function StatusPage() {
                     title="Database"
                     status={loading ? 'loading' : (status?.database?.status || 'error')}
                     message={loading ? 'Connecting…' : (status?.database?.message || 'Unknown')}
-                    detail="SQLite · qa_history.db"
+                    detail="Supabase · PostgreSQL"
                 />
                 <StatusCard
                     icon="🤖"
@@ -151,7 +151,7 @@ export default function StatusPage() {
                         { label: 'Model', value: 'llama-3.3-70b-versatile' },
                         { label: 'Backend Framework', value: 'FastAPI 0.115' },
                         { label: 'Frontend Framework', value: 'React 19 + Vite 7' },
-                        { label: 'Database', value: 'SQLite (embedded)' },
+                        { label: 'Database', value: 'Supabase (PostgreSQL)' },
                         { label: 'Max ZIP size', value: '50 MB' },
                         { label: 'Max files indexed', value: '300 files' },
                         { label: 'Context window', value: '~28,000 chars per query' },

@@ -20,7 +20,7 @@ load_dotenv()
 
 from codebase_parser import parse_codebase, fetch_github_repo
 from llm_handler import ask_llm_with_context, check_llm_health
-from db import init_db, save_qa, get_recent_qas, get_all_tags, get_qa_by_id
+from db import init_db, save_qa, get_recent_qas, get_all_tags, get_qa_by_id, check_db_health
 
 app = FastAPI(title="Codebase Q&A with Proof", version="1.0.0")
 
@@ -53,16 +53,7 @@ class GitHubRequest(BaseModel):
 @app.get("/api/health")
 async def health_check():
     """Status page - checks backend, DB, and LLM connection."""
-    db_ok = False
-    db_msg = ""
-    try:
-        conn = sqlite3.connect("qa_history.db")
-        conn.execute("SELECT 1")
-        conn.close()
-        db_ok = True
-        db_msg = "Connected"
-    except Exception as e:
-        db_msg = str(e)
+    db_ok, db_msg = check_db_health()
 
     llm_ok, llm_msg = await check_llm_health()
 

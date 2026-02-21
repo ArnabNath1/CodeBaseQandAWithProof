@@ -1,41 +1,42 @@
 """
-SQLite database layer for Q&A history.
+Supabase database layer for Q&A history.
+Replaces the SQLite implementation for better cloud deployment.
 """
 
-import sqlite3
+import os
 import json
 from typing import Optional, List
 from datetime import datetime
+from supabase import create_client, Client
 
-# Use a persistent path if running on Render/Docker, otherwise local
-if os.path.exists("/app/data"):
-    DB_PATH = "/app/data/qa_history.db"
-else:
-    DB_PATH = "qa_history.db"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
+_supabase: Optional[Client] = None
 
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+def get_db() -> Client:
+    global _supabase
+    if _supabase is None:
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            raise ValueError("SUPABASE_URL or SUPABASE_KEY not set in environment")
+        _supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    return _supabase
+
+def check_db_health() -> tuple[bool, str]:
+    """Checks if Supabase is reachable and the table exists."""
+    try:
+        get_db().table("qa_history").select("id").limit(1).execute()
+        return True, "Connected to Supabase"
+    except Exception as e:
+        return False, str(e)
 
 
 def init_db():
-    conn = get_conn()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS qa_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            question TEXT NOT NULL,
-            answer TEXT NOT NULL,
-            snippets TEXT DEFAULT '[]',
-            tags TEXT DEFAULT '[]',
-            source TEXT DEFAULT '',
-            created_at TEXT DEFAULT (datetime('now'))
-        )
-    """)
-    conn.commit()
-    conn.close()
-
+    health_ok, msg = check_db_health()
+    if health_ok:
+        print(f"✓ {msg}")
+    else:
+        print(f"⚠ Warning: {msg}")
 
 def save_qa(
     question: str,
@@ -44,90 +45,68 @@ def save_qa(
     tags: str = "[]",
     source: str = "",
 ) -> int:
-    conn = get_conn()
-    cursor = conn.execute(
-        """INSERT INTO qa_history (question, answer, snippets, tags, source)
-           VALUES (?, ?, ?, ?, ?)""",
-        (question, answer, snippets, tags, source),
-    )
-    conn.commit()
-    new_id = cursor.lastrowid
-    conn.close()
-    return new_id
+    # Convert string JSONs back to lists/dicts for Supabase jsonb
+    try:
+        snippets_data = json.loads(snippets)
+    except:
+        snippets_data = []
+    
+    try:
+        tags_data = json.loads(tags)
+    except:
+        tags_data = []
 
+    data = {
+        "question": question,
+        "answer": answer,
+        "snippets": snippets_data,
+        "tags": tags_data,
+        "source": source
+    }
+    
+    # Supabase uses 'returning' by default to get the inserted row
+    response = get_db().table("qa_history").insert(data).execute()
+    if response.data:
+        return response.data[0]["id"]
+    return 0
 
 def get_recent_qas(
     limit: int = 10,
     search: Optional[str] = None,
     tag: Optional[str] = None,
 ) -> List[dict]:
-    conn = get_conn()
-    query = "SELECT * FROM qa_history"
-    params = []
-    conditions = []
+    query = get_db().table("qa_history").select("*")
 
     if search:
-        conditions.append("(question LIKE ? OR answer LIKE ?)")
-        params.extend([f"%{search}%", f"%{search}%"])
+        # Or filter for search in question OR answer
+        query = query.or_(f"question.ilike.%{search}%,answer.ilike.%{search}%")
 
-    if conditions:
-        query += " WHERE " + " AND ".join(conditions)
+    # Supabase filter for JSON arrays: 'tags' @> '["mytag"]'
+    if tag:
+        query = query.contains("tags", [tag])
 
-    query += " ORDER BY created_at DESC LIMIT ?"
-    params.append(limit)
-
-    rows = conn.execute(query, params).fetchall()
-    conn.close()
-
+    response = query.order("created_at", desc=True).limit(limit).execute()
+    
+    # Format data for frontend (ensure snippets/tags are present)
     results = []
-    for row in rows:
-        item = dict(row)
-        try:
-            item["snippets"] = json.loads(item["snippets"])
-        except Exception:
-            item["snippets"] = []
-        try:
-            item["tags"] = json.loads(item["tags"])
-        except Exception:
-            item["tags"] = []
-
-        # Filter by tag if provided
-        if tag and tag not in item["tags"]:
-            continue
-
-        results.append(item)
-
+    for row in (response.data or []):
+        results.append(row)
+    
     return results
 
-
 def get_all_tags() -> List[str]:
-    conn = get_conn()
-    rows = conn.execute("SELECT tags FROM qa_history WHERE tags != '[]'").fetchall()
-    conn.close()
-
+    # This is a bit complex in Supabase SQL without a dedicated tags table.
+    # For now, we fetch recent rows and aggregate locally.
+    response = get_db().table("qa_history").select("tags").execute()
+    
     all_tags = set()
-    for row in rows:
-        try:
-            tags = json.loads(row["tags"])
+    for row in (response.data or []):
+        tags = row.get("tags")
+        if isinstance(tags, list):
             all_tags.update(tags)
-        except Exception:
-            pass
+    
     return sorted(list(all_tags))
 
-
 def get_qa_by_id(qa_id: int) -> Optional[dict]:
-    conn = get_conn()
-    row = conn.execute("SELECT * FROM qa_history WHERE id = ?", (qa_id,)).fetchone()
-    conn.close()
-    if not row:
-        return None
-    item = dict(row)
-    try:
-        item["snippets"] = json.loads(item["snippets"])
-    except Exception:
-        item["snippets"] = []
-    try:
-        item["tags"] = json.loads(item["tags"])
-    except Exception:
-        item["tags"] = []
-    return item
+    response = get_db().table("qa_history").select("*").eq("id", qa_id).single().execute()
+    return response.data if response.data else None
