@@ -1,33 +1,59 @@
 # Prompts Used During Development
 
-This file records the prompts given to the AI coding agent (Antigravity) during the development of CodeProof.
+This file records the evolutionary prompts given to the AI coding assistant during the creation of **CodeProof**.
 
 ---
 
-## Session 1 — Initial Build
+## 🏗️ Phase 1: Core Foundation
 
-### Prompt 1
-> Codebase Q&A with Proof. Build a web app where I can:
-> - upload a zip of a small codebase (or connect a public GitHub repo URL)
-> - ask questions like "Where is auth handled?" or "How do retries work?"
-> - get an answer with: file paths + line ranges (or code snippets), links to the referenced files in the UI, show the retrieved code snippets separately
-> - save last 10 Q&As
-> Make it your own: for example, add search, tags, or "generate refactor suggestions".
->
-> What to include:
-> - A simple home page with clear steps
-> - A status page, that shows health of backend, database, and llm connection.
-> - Basic handling for empty/wrong input
-> - A short README: how to run, what is done, what is not done
-> - A short AI_NOTES.md: what you used AI for, and what you checked yourself. Which LLM and provider does your app use and why.
-> - Put your name and resume in ABOUTME.md
-> - A PROMPTS_USED.md, with records of your prompts used for app development.
->
-> Rules for Github repo: Do not put API keys or passwords in the code. Use a .env.example file for settings.
+### Project Scaffolding
+> Build a full-stack Codebase Q&A application named "CodeProof". 
+> - **Frontend**: React + Vite + CSS (Glassmorphism design).
+> - **Backend**: FastAPI (Python).
+> - **Core Logic**: Support ZIP uploads and GitHub URL indexing.
+> - **AI Integration**: Use Groq (Llama 3.3 70B) for speed and quality. Cites exact file paths and line ranges.
+> - **Features**: Searchable history, tagging system, and "AI Refactor Suggestions" mode.
 
-### Prompt 2
-> Create a virtual environment in the backend, activate it and then continue
+### Database Initialization
+> Set up an SQLite database using the `sqlite3` library to store the last 10 Q&A pairs. Include fields for `question`, `answer`, `snippets` (as JSON), and `tags`.
 
 ---
 
-*Note: Agent responses, API keys, and internal tool calls are not included per the instructions.*
+## 🎨 Phase 2: User Experience & Design
+
+### UI Design System
+> Create a comprehensive CSS design system in `index.css` featuring a premium dark theme, glassmorphism cards, vibrant accents (`#6366f1`), and smooth micro-animations for buttons and transitions. Use Google Fonts (Inter and Outfit).
+
+### Component Orchestration
+> Develop a tabbed `UploadPanel` for switching between ZIP and GitHub modes. Build a `SnippetCard` component that makes code blocks collapsible and includes a "Copy Code" button.
+
+---
+
+## 🔌 Phase 3: Cloud Pivot & Infrastructure
+
+### Supabase Integration
+> I want to deploy this. Replace the SQLite implementation with Supabase (Postgres). 
+> - Install the `supabase-py` client.
+> - Update `db.py` to handle JSONB columns for snippets and tags.
+> - Update the "Status Page" to verify the Supabase connection health.
+
+### Dockerization
+> Create a `docker-compose.yml` and `Dockerfile`s for both services. The frontend should use a multi-stage Nginx build.
+
+---
+
+## 🛠️ Phase 4: Production Hardening
+
+### Github API Rate Limiting
+> When indexing a public repo, I'm hitting the 60 calls/hour limit. Update the backend to accept an optional `GITHUB_TOKEN` from the environment to increase the limit to 5000 calls/hour.
+
+### Render & Vercel Fixes
+> - The Render build is failing because it's defaulting to Python 3.14. Force Python 3.11 using `runtime.txt`.
+> - The frontend is getting 404s because of a double slash (//api) in the URL. Sanitize the `VITE_API_URL` to remove trailing slashes.
+
+---
+
+## 📄 Phase 5: Documentation & Presentation
+
+### README and AI Notes
+> Finalize the documentation. Write a `README.md` with hosting instructions for Render/Vercel. Create `AI_NOTES.md` explaining why we chose Groq (LPU speed) and Llama 3.3. Update `ABOUTME.md` with my resume placeholder.

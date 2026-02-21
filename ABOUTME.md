@@ -1,60 +1,66 @@
 # About Me
 
-## Name: [Your Name Here]
+## Arnab Nath
 
-## Resume
+**Software Engineer | AI & Backend Specialist**
 
-**[Your Name]**  
-*Software Engineer*
-
-📧 your.email@example.com  
-🔗 [linkedin.com/in/yourprofile](https://linkedin.com)  
-🐙 [github.com/yourusername](https://github.com)  
-🌍 [yourportfolio.com](https://yourportfolio.com)
+Software Engineer specializing in the development of backend services, AI Agents, and Retrieval-Augmented Generation (RAG) systems. Proficient in applying AI and ML principles to create innovative and efficient software solutions. Comfortable working across databases and model-driven features including retrieval pipelines and intelligent automation.
 
 ---
 
-### Summary
+### 🛠️ Technical Skills
 
-Passionate software engineer with experience building full-stack web applications, working with LLMs/AI APIs, and designing clean, scalable backend systems.
-
----
-
-### Technical Skills
-
-**Languages:** Python, JavaScript/TypeScript, SQL  
-**Frameworks:** FastAPI, React, Node.js, Express  
-**AI/ML:** LLM integration (Groq, OpenAI, Gemini), RAG pipelines, prompt engineering  
-**Databases:** PostgreSQL, SQLite, Redis  
-**DevOps:** Docker, GitHub Actions, Render, Vercel  
-**Tools:** Git, VS Code, Postman
+- **Languages**: Java, Python, HTML, CSS, JavaScript, SQL, Machine Learning
+- **Frameworks**: FastAPI, Next.js, Flask, LangChain, LlamaIndex, Material-UI, RapidAPI
+- **Developer Tools & Platforms**: Git, Docker, Kubernetes, Prometheus, Grafana, Cursor, Google Antigravity, Pinecone, AstraDB, Supabase, Groq
+- **Libraries**: Pandas, NumPy, Matplotlib, Scikit-Learn
+- **Specializations**: GenAI-powered Automation, RAG Pipelines, Risk Simulation, Portfolio Search Engines
 
 ---
 
-### Experience
+### 🚀 Projects
 
-**Software Engineer** — [Company Name]  
-*Date – Present*  
-- Built and maintained full-stack web applications used by X+ users  
-- Designed RESTful APIs with Python/FastAPI  
-- Integrated LLM APIs into production features  
+**Flipkart Product Recommendation System** | *Python, Flask, LangChain, AstraDB, Docker*
+- Built a lightweight RAG-powered product recommendation system using TF-IDF and AstraDB vector search.
+- Containerized the app with Docker and integrated Prometheus/Grafana for monitoring.
 
-**[Previous Role]** — [Company Name]  
-*Date – Date*  
-- [Achievement or responsibility]
+**AI Study Abroad Counsellor** | *Python, Generative AI, Next.js 15, FastAPI, Groq, Supabase*
+- Built an AI counseling platform using Llama 3.3 for personalized university recommendations.
+- Developed an AI CV Parser to extract academic data and styled with a glassmorphism dark-themed UI.
 
----
-
-### Education
-
-**[Degree]** in [Field]  
-[University Name] — [Year]
+**Travel Planner** | *Python, LangChain, Streamlit, Folium, GeoPy, Mistral-7B*
+- Developed an end-to-end Travel Planner using the LangChain framework and Mistral-7B Instruct model.
+- Created an interactive map interface using Folium and GeoPy for location coordinates.
 
 ---
 
-### Projects
+### 💼 Experience
 
-**CodeProof** — Codebase Q&A with LLM-backed proof  
-Built a full-stack app that lets users upload a codebase (ZIP or GitHub) and ask natural-language questions, receiving answers with exact file paths, line ranges, and code snippets.
+**Software Engineer | LTIMindtree** (Oct 2024 – Dec 2025)
 
-> Stack: FastAPI · React · Groq LLM · SQLite · Vite
+- Architected a GenAI-powered code translation engine for modernizing 500+ legacy applications.
+- Built an LLM-powered resume screening tool reducing processing time by 85%.
+- Pioneered a GenAI documentation system to auto-generate technical specs from source code.
+
+---
+
+### 🎓 Education
+
+**Bachelor of Technology in Computer Science and Engineering (AI and ML)**
+Haldia Institute of Technology (2020 – 2024) | **CGPA: 9.02**
+
+---
+
+### 🏆 Certificates & Achievements
+
+- Microsoft Certified Azure Fundamentals
+- Hacktoberfest 2025
+- GitHub Copilot Specialist
+
+---
+
+### 🔗 Connect with Me
+
+- **GitHub**: [ArnabNath1](https://github.com/ArnabNath1)
+- **LinkedIn**: [Arnab Nath](https://linkedin.com/in/arnabnath07/)
+- **Email**: arnabbumba077@gmail.com
