@@ -10,6 +10,7 @@ Ask natural-language questions about any codebase and get answers backed by **ex
 - Python 3.9+
 - Node.js 18+
 - A Groq API key (free at [groq.com](https://console.groq.com))
+- A Supabase project (free at [supabase.com](https://supabase.com))
 
 ### 1. Clone & Configure
 
@@ -31,9 +32,24 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-# Copy and fill in your Groq API key
+# Copy and fill in your keys
 cp .env.example .env
-# Edit .env and set GROQ_API_KEY=your_key_here
+# Edit .env and set GROQ_API_KEY, SUPABASE_URL, and SUPABASE_KEY
+```
+
+### 3. Database Setup (Supabase)
+Run the following SQL in your Supabase SQL Editor to create the history table:
+
+```sql
+create table if not exists qa_history (
+  id bigint primary key generated always as identity,
+  question text not null,
+  answer text not null,
+  snippets jsonb default '[]'::jsonb,
+  tags jsonb default '[]'::jsonb,
+  source text default '',
+  created_at timestamptz default now()
+);
 ```
 
 ### 3. Run Backend
@@ -71,14 +87,11 @@ docker-compose up --build
 
 ## 🌐 Hosting
 
-To keep the app live for review:
-
 1. **Frontend**: Can be hosted on **Vercel**, **Netlify**, or **Cloudflare Pages**.
    - Set `VITE_API_URL` environment variable to your backend URL.
 2. **Backend**: Can be hosted on **Render**, **Railway**, or **Fly.io**.
-   - Create a Web Service and set `GROQ_API_KEY`.
-   - Ensure the `qa_history.db` is stored on a persistent volume if you want history to survive restarts.
-3. **Database**: The app uses SQLite for simplicity, which works on persistent disks. For serverless backends like Vercel Functions, consider switching to a hosted PostgreSQL (e.g., Supabase or Neon) and updating `db.py`.
+   - Set `GROQ_API_KEY`, `SUPABASE_URL`, and `SUPABASE_KEY` in the service settings.
+3. **Database**: Now using **Supabase (PostgreSQL)**, which is cloud-hosted and persists history regardless of server restarts or deployments.
 
 ---
 
@@ -91,7 +104,7 @@ To keep the app live for review:
 - **Proof with snippets** — every answer cites file paths + line ranges + the actual code
 - **Code Snippet Viewer** — collapsible inline code viewer with copy button
 - **Tagging** — add tags to each Q&A for future reference
-- **History** — last 10 Q&As persisted in SQLite; searchable by keyword and tag
+- **History** — last 10 Q&As persisted in Supabase; searchable by keyword and tag
 - **Refactor Suggestions** — AI-generated, file-aware refactor ideas with before/after context
 - **Status Page** — health checks for backend, DB, and LLM with auto-refresh
 - **Responsive UI** — works on mobile
@@ -123,7 +136,7 @@ backend/           FastAPI Python app
   main.py          Routes & app entry point
   codebase_parser.py  ZIP + GitHub repo indexer
   llm_handler.py   Groq API call + context builder
-  db.py            SQLite layer
+  db.py            Supabase (PostgreSQL) layer
 ```
 
 ## 🔑 Environment Variables
@@ -131,4 +144,7 @@ backend/           FastAPI Python app
 | Variable | Where | Description |
 |---|---|---|
 | `GROQ_API_KEY` | `backend/.env` | Your Groq API key |
+| `SUPABASE_URL` | `backend/.env` | Your Supabase Project URL |
+| `SUPABASE_KEY` | `backend/.env` | Your Supabase Anon Key |
+| `GITHUB_TOKEN` | `backend/.env` | (Optional) GitHub Token for higher rate limits |
 | `VITE_API_URL` | `frontend/.env` | Backend URL (default: `http://localhost:8000`) |
