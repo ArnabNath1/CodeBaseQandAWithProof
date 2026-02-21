@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const VITE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Sanitize: ensure no trailing slash
+const API_BASE = VITE_API_URL.endsWith('/') ? VITE_API_URL.slice(0, -1) : VITE_API_URL;
 
 async function request(method, path, body = null, isFormData = false) {
     const opts = {
@@ -8,7 +10,9 @@ async function request(method, path, body = null, isFormData = false) {
     if (body) {
         opts.body = isFormData ? body : JSON.stringify(body);
     }
-    const res = await fetch(`${API_BASE}${path}`, opts);
+    // Ensure path starts with /
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    const res = await fetch(`${API_BASE}${cleanPath}`, opts);
     if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: res.statusText }));
         throw new Error(err.detail || `HTTP ${res.status}`);
